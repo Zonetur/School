@@ -44,7 +44,7 @@ def kalkulator_figur_bryl():
 
         elif wybor_figury == "4":
             print("1. Pole z wysokością")
-            print("2. Pole ze wzoru Herona")
+            print("2. Pole ze wzoru")
             print("3. Obwód")
             pod_wybor = input("Wybierz rodzaj obliczeń: ")
             if pod_wybor == "1":
@@ -59,7 +59,7 @@ def kalkulator_figur_bryl():
                 if a + b > c and a + c > b and b + c > a:
                     s = (a + b + c) / 2
                     pole = math.sqrt(s * (s - a) * (s - b) * (s - c))
-                    print(f"Pole trójkąta (Heron): {pole:.2f}")
+                    print(f"Pole trójkąta: {pole:.2f}")
                 else:
                     print("Nie można utworzyć trójkąta z podanych boków.")
             elif pod_wybor == "3":
