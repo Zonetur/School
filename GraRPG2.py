@@ -219,8 +219,8 @@ def losowe_wydarzenie():
 
     elif wydarzenie == 'burza':
         print("\nNagle nad polem walki pojawia się groźna burza! Oboje rycerze muszą zmierzyć się z jej potężnym wiatrem.")
-        gracz_1['hp'] -= randint(10, 40)
-        gracz_2['hp'] -= randint(10, 40)
+        gracz_1['hp'] = gracz_1['hp'] - randint(10, 40)
+        gracz_2['hp'] = gracz_2['hp'] - randint(10, 40)
         print(f"Rycerze tracą trochę zdrowia przez burzę! {gracz_1['name']} HP: {gracz_1['hp']}, {gracz_2['name']} HP: {gracz_2['hp']}")
 
     elif wydarzenie == 'smok':
@@ -375,9 +375,11 @@ przypisz_artefakt(gracz_2, artefakt_gracz_2)
 # Główna pętla gry - zmiana tur
 
 while gracz_1['hp'] > 0 and gracz_2['hp'] > 0:
-    print("-" * 40)
-    print(f"{gracz_1['name']} HP: {gracz_1['hp']} | Mana: {gracz_1['mana']} | Inicjatywa: {gracz_1['inicjatywa']} | Siła: {gracz_1['power']} | {gracz_2['name']} HP: {gracz_2['hp']} | Mana: {gracz_2['mana']} | Inicjatywa: {gracz_2['inicjatywa']} | Siła: {gracz_2['power']}")
-    print("-" * 40)
+    podsumowanie = f"| {gracz_1['name']} HP: {gracz_1['hp']} | Mana: {gracz_1['mana']} | Inicjatywa: {gracz_1['inicjatywa']} | Siła: {gracz_1['power']} | {gracz_2['name']} HP: {gracz_2['hp']} | Mana: {gracz_2['mana']} | Inicjatywa: {gracz_2['inicjatywa']} | Siła: {gracz_2['power']} |"
+    dlugosc_podsumowania = len(podsumowanie)
+    print("-" * dlugosc_podsumowania)
+    print(podsumowanie)
+    print("-" * dlugosc_podsumowania)
 
     # Sprawdzanie, kto zaczyna turę
     kto_pierwszy = kto_zaczyna()
@@ -424,12 +426,15 @@ while gracz_1['hp'] > 0 and gracz_2['hp'] > 0:
     if liczba_rund % 4 == 0:
         losowe_wydarzenie()
 
-    # Narracja co 3 rundy
-    if liczba_rund % 3 == 0:
+    # Narracja co 3 rundy ale nie ma narracji gdy jest wydarzenie
+    if liczba_rund % 3 == 0 and liczba_rund % 4 != 0:
         losowa_narracja()
 
-    # Sprawdzenie rundy
+    # zmniejszenie liczby rund o 1
     liczba_rund -= 1
+    print(f'pozostało {liczba_rund} rund do końca')
+
+    # Sprawdzenie rundy
     if liczba_rund == 0:
         print("Koniec rund! Gra zakończona remisem!")
         break
