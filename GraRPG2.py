@@ -63,7 +63,6 @@ def display_game_end(winner_name):
         _____                                                         _____
        /     \\                                                      /     \\
       /       \\                  JESTEŚ ZWYCIĘZCĄ!                /       \\
-     |         |                                                  |         |
       \\       /                                                  \\       /
        \\_____/                                                    \\_____/
 
@@ -297,7 +296,7 @@ def losowa_narracja():
         f"Tłum wiwatuje, a elfy zaczęły śpiewać pieśń pochwalną na cześć {gracz_2['name']}! Widać ich poparcie.",
         f"Ogromne zaskoczenie na trybunach, kiedy {gracz_1['name']} wykonał niespodziewany atak! Widownia wstrzymała oddech.",
         f"Troll z trybun krzyczy w stronę {gracz_2['name']}: 'Wstyd! Pokonaj go!' Tłum zaczyna go wspierać.",
-        f"Z trybun rozbrzmiewa śmiech grupy kurtyzan, które uwielbiają oglądać każdy ruch {gracz_1['name']}. To chyba ich ulubiony rycerz!",
+        f"Z trybun rozbrzmiewa śmiech grupy kurtyzan, które uwielbiają oglądać każdy ruch gracza {gracz_1['name']}. To chyba ich ulubiony rycerz!",
         f"Z oddali można usłyszeć pieśń o miłości, którą śpiewa zakochana księżniczka w imieniu {gracz_2['name']}! Tłum jest wzruszony.",
         f"Z nieba spada ogromny cień – to smoki przelatują nad areną, ale nie zagrażają rycerzom. Tłum wiwatuje na ich widok!",
         f"Na trybunach pojawiła się tajemnicza postać - wiedźma z wielkim kapeluszem, która szeptała, że zwycięzca tej bitwy będzie błogosławiony przez same bogi!",
