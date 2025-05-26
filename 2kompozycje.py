@@ -24,9 +24,11 @@ class Osoba:
 
 class Uczen:
     def __init__(self, osoba, klasa):
-        self.osoba = osoba  # Kompozycja zamiast dziedziczenia
+        self.osoba = osoba
         self.klasa = klasa
         self.oceny = {}
+        self.absencje = []
+        self.aktywne = True
 
     def dodaj_ocene(self, przedmiot, ocena):
         if przedmiot not in self.oceny:
@@ -41,17 +43,29 @@ class Uczen:
         wszystkie = [o for lista in self.oceny.values() for o in lista]
         return round(sum(wszystkie) / len(wszystkie), 2) if wszystkie else 0.0
 
+    def dodaj_absencje(self, data):
+        self.absencje.append(data)
+
+    def zmien_status(self, status):
+        self.aktywne = status
+
     def inf(self):
         print(self.osoba.inf())
         print(f"Klasa: {self.klasa}")
         for przedmiot, oceny in self.oceny.items():
             print(f"  {przedmiot}: {oceny}")
         print(f"Średnia: {self.srednia():.2f}")
+        if self.absencje:
+            print(f"Nieobecności: {', '.join(self.absencje)}")
+        else:
+            print("Brak nieobecności")
+        print("Status: " + ("Aktywny" if self.aktywne else "Nieaktywny"))
 
     def to_string(self):
         base = self.osoba.to_string()
-        oceny_str = ",".join(f"{p}:{','.join(map(str, o))}" for p, o in self.oceny.items())
-        return f"{base}|{self.klasa}|{oceny_str}"
+        oceny_str = ",".join(f"{p}:{','.join(map(str,o))}" for p,o in self.oceny.items())
+        absencje_str = ";".join(self.absencje)
+        return f"{base}|{self.klasa}|{oceny_str}|{absencje_str}|{int(self.aktywne)}"
 
     @staticmethod
     def from_string(data):
@@ -65,6 +79,10 @@ class Uczen:
                     przedmiot, oceny_str = przedmiot_oceny.split(":")
                     oceny = list(map(int, oceny_str.split(",")))
                     uczen.oceny[przedmiot] = oceny
+        if len(parts) > 6 and parts[6]:
+            uczen.absencje = parts[6].split(";")
+        if len(parts) > 7:
+            uczen.aktywne = bool(int(parts[7]))
         return uczen
 
 class Dziennik:
@@ -86,6 +104,25 @@ class Dziennik:
     def filtruj_klase(self, klasa):
         return [u for u in self.uczniowie if u.klasa.lower() == klasa.lower()]
 
+    def znajdz_najlepszego(self):
+        if not self.uczniowie:
+            print("Brak uczniów.")
+            return
+        najlepszy = max(self.uczniowie, key=lambda u: u.srednia())
+        print("Uczeń z najwyższą średnią:")
+        najlepszy.inf()
+
+    def znajdz_najgorszego(self):
+        if not self.uczniowie:
+            print("Brak uczniów.")
+            return
+        najgorszy = min(self.uczniowie, key=lambda u: u.srednia())
+        print("Uczeń z najniższą średnią:")
+        najgorszy.inf()
+
+    def aktywni_uczniowie(self):
+        return [u for u in self.uczniowie if u.aktywne]
+
     def zapisz_do_pliku(self, nazwa):
         with open(nazwa, "w", encoding="utf-8") as f:
             for u in self.uczniowie:
@@ -100,6 +137,9 @@ class Dziennik:
                 self.dodaj_ucznia(uczen)
 
     def pokaz_wszystkich(self):
+        if not self.uczniowie:
+            print("Brak uczniów w dzienniku.")
+            return
         for u in self.uczniowie:
             print("=" * 30)
             u.inf()
@@ -107,20 +147,22 @@ class Dziennik:
 def menu():
     dziennik = Dziennik()
     dziennik.wczytaj_z_pliku("dziennik.txt")
-
     while True:
-        print("\n--- MENU ---")
+        print("\n MENU")
         print("1. Dodaj ucznia")
         print("2. Dodaj ocenę")
-        print("3. Wyświetl uczniów")
-        print("4. Szukaj ucznia po nazwisku")
-        print("5. Usuń ucznia")
-        print("6. Sortuj po średniej")
-        print("7. Filtruj po klasie")
-        print("8. Zapisz do pliku")
-        print("9. Wyjdź")
+        print("3. Dodaj nieobecność")
+        print("4. Wyświetl uczniów")
+        print("5. Szukaj ucznia po nazwisku")
+        print("6. Usuń ucznia")
+        print("7. Sortuj po średniej")
+        print("8. Filtruj po klasie")
+        print("9. Najlepszy uczeń")
+        print("10. Najgorszy uczeń")
+        print("11. Zmień status ucznia")
+        print("12. Zapisz do pliku")
+        print("13. Wyjdź")
         wybor = input("Wybierz opcję: ")
-
         if wybor == "1":
             imie = input("Imię: ")
             nazwisko = input("Nazwisko: ")
@@ -129,7 +171,6 @@ def menu():
             osoba = Osoba(imie, nazwisko, wiek)
             uczen = Uczen(osoba, klasa)
             dziennik.dodaj_ucznia(uczen)
-
         elif wybor == "2":
             nazwisko = input("Nazwisko ucznia: ")
             uczniowie = dziennik.znajdz_ucznia(nazwisko)
@@ -140,11 +181,18 @@ def menu():
                     uczen.dodaj_ocene(przedmiot, ocena)
             else:
                 print("Nie znaleziono ucznia.")
-
         elif wybor == "3":
-            dziennik.pokaz_wszystkich()
-
+            nazwisko = input("Nazwisko ucznia: ")
+            uczniowie = dziennik.znajdz_ucznia(nazwisko)
+            if uczniowie:
+                data = input("Data nieobecności (dd-mm-rrrr): ")
+                for uczen in uczniowie:
+                    uczen.dodaj_absencje(data)
+            else:
+                print("Nie znaleziono ucznia.")
         elif wybor == "4":
+            dziennik.pokaz_wszystkich()
+        elif wybor == "5":
             nazwisko = input("Nazwisko: ")
             znalezieni = dziennik.znajdz_ucznia(nazwisko)
             if znalezieni:
@@ -152,29 +200,36 @@ def menu():
                     u.inf()
             else:
                 print("Brak wyników.")
-
-        elif wybor == "5":
+        elif wybor == "6":
             nazwisko = input("Nazwisko do usunięcia: ")
             dziennik.usun_ucznia(nazwisko)
-
-        elif wybor == "6":
-            dziennik.sortuj_po_sredniej()
-
         elif wybor == "7":
+            dziennik.sortuj_po_sredniej()
+        elif wybor == "8":
             klasa = input("Podaj klasę: ")
             wyniki = dziennik.filtruj_klase(klasa)
             for u in wyniki:
                 u.inf()
-
-        elif wybor == "8":
+        elif wybor == "9":
+            dziennik.znajdz_najlepszego()
+        elif wybor == "10":
+            dziennik.znajdz_najgorszego()
+        elif wybor == "11":
+            nazwisko = input("Nazwisko ucznia: ")
+            uczniowie = dziennik.znajdz_ucznia(nazwisko)
+            if uczniowie:
+                status = input("Podaj nowy status (aktywny/nieaktywny): ").lower()
+                for u in uczniowie:
+                    u.zmien_status(status == "aktywny")
+            else:
+                print("Nie znaleziono ucznia.")
+        elif wybor == "12":
             dziennik.zapisz_do_pliku("dziennik.txt")
             print("Zapisano do pliku.")
-
-        elif wybor == "9":
+        elif wybor == "13":
             dziennik.zapisz_do_pliku("dziennik.txt")
             print("Zamykam program.")
             break
-
         else:
             print("Nieznana opcja.")
 
